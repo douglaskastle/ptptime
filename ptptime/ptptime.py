@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 import datetime
-#import time
+import time
 
 def getLeapYear(t):
 	if  t.year <= 1972:
-		return 0
+		return 1
 	elif t.year >= 1999 or t.year <= 2000:
 		return 32
 	elif t.year >= 2013 or t.year <= 2016:
@@ -39,9 +39,50 @@ class timedelta(datetime.timedelta):
 		if 'nanoseconds' in kwargs.keys():
 			nanoseconds = kwargs['nanoseconds']
 			del kwargs['nanoseconds']
+		if not 'microseconds' in kwargs.keys():
+			kwargs['microseconds'] = 0
+		
+		if nanoseconds < 0:
+			kwargs['microseconds'] -= 1
+
+		kwargs['microseconds'] += int(nanoseconds/1000.0)
+		nanoseconds = nanoseconds%1000
+		
 		c = super(timedelta, cls).__new__(cls, *args, **kwargs)
 		c.nanoseconds = nanoseconds
+		
 		return c
+
+	@property
+	def hour(self):
+		return int(self.seconds/3600)
+
+	@property
+	def minute(self):
+		return int(self.seconds/60)%60
+
+	@property
+	def second(self):
+		return self.seconds%60
+
+	def __str__(self, *args, **kwargs):
+		days = ""
+		micros = ""
+		nanos = ""
+		if not self.days == 0:
+			pural = ""
+			if abs(self.days) > 1:
+				pural = "s"
+			days = "{0:d} day{1}, ".format(self.days, pural)
+		if not self.microseconds == 0 or not self.nanoseconds == 0:
+			micros = ".{0:06d}".format(self.microseconds)
+		if not self.nanoseconds == 0:
+			nanos = ":{0:03d}".format(self.nanoseconds)
+		return "{0}{1:d}:{2:02d}:{3:02d}{4}{5}".format(
+		                days,
+						self.hour,self.minute,self.second,
+						micros, nanos
+						)
 
 class ptptime(datetime.datetime):
 	def __new__(cls, *args, **kwargs):
@@ -65,9 +106,27 @@ class ptptime(datetime.datetime):
 		
 		return c
 	
-	def __sub__(self, *args, **kwargs):
-		print self, args
-		c = super(ptptime, self).__sub__(*args, **kwargs)
+	def __str__(self):
+		return "{0}-{1}-{2} {3:02d}:{4:02d}:{5:02d}.{6:06d}:{7:03d}".format(
+						self.year,self.month,self.day,
+						self.hour,self.minute,self.second,
+						self.microsecond,self.nanosecond,
+						)
+
+	def iena_str(self):
+		return "{1}-{2} {3:02d}:{4:02d}:{5:02d}.{6:06d}".format(
+						self.year,self.month,self.day,
+						self.hour,self.minute,self.second,
+						self.microsecond,self.nanosecond,
+						)
+
+	def __add__(self, *args, **kwargs):
+		td = args[0]
+		c = super(ptptime, self).__add__(*args, **kwargs)
+		
+		nanoseconds = self.nanosecond + td.nanoseconds
+		microsecond = c.microsecond + int(nanoseconds/1000.0)
+		nanoseconds %= 1000
 		
 		t = ptptime(c.year, 
 					c.month, 
@@ -75,9 +134,39 @@ class ptptime(datetime.datetime):
 					c.hour,
 					c.minute,
 					c.second,
-					c.microsecond,
-					self.nanosecond,
+					microsecond,
+					nanoseconds,
 				   )
+		return t
+	
+	def __sub__(self, *args, **kwargs):
+		if isinstance(args[0], timedelta):
+			td = args[0]
+			x = timedelta(days=-td.days, 
+						  seconds=-td.seconds, 
+						  microseconds=-td.microseconds, 
+						  nanoseconds=-td.nanoseconds
+						 )
+			args = [x]
+		elif isinstance(args[0], ptptime):
+			t0 = self
+			t1 = args[0]
+			d0 = datetime.datetime(t0.year,t0.month,t0.day,t0.hour,t0.minute,t0.second)
+			d1 = datetime.datetime(t1.year,t1.month,t1.day,t1.hour,t1.minute,t1.second)
+			total_seconds = (d0 - d1).total_seconds()
+			attr_list = ('year', 'month', 'day', 'hour', 'minute', 'second', 'microsecond', 'nanosecond',)
+			b = {}
+			for a in attr_list:
+				#print a
+				b[a] = getattr(self, a) - getattr(args[0], a)
+			return timedelta(seconds=total_seconds, 
+						     microseconds=b['microsecond'], 
+						     nanoseconds=b['nanosecond'],
+							)
+		else:
+			raise Exception
+
+		t = self.__add__(*args, **kwargs)
 		return t
 	
 	def replace(self, *args, **kwargs):
@@ -111,7 +200,6 @@ class ptptime(datetime.datetime):
 	
 	@property
 	def ptp(self):
-		#time_lo = (self.microsecond) * 1000 + self.nanosecond
 		ptp     = (self.total_seconds << 32) | ((self.microsecond) * 1000 + self.nanosecond)
 		return ptp
 	
@@ -149,12 +237,6 @@ class ptptime(datetime.datetime):
 		sbi |= (sbi_days       & 0xffff) << 64 # UxDay
 		return sbi
 
-	def __str__(self):
-		return "{0}-{1}-{2} {3:02d}:{4:02d}:{5:02d}.{6:06d}:{7:03d}".format(
-						self.year,self.month,self.day,
-						self.hour,self.minute,self.second,
-						self.microsecond,self.nanosecond,
-						)
 	
 	def printPTP(self):
 		print("0x{0:016x}".format(self.ptp))
@@ -165,13 +247,18 @@ class ptptime(datetime.datetime):
 	def printSBI(self):
 		print("0x{0:020x}".format(self.sbi))
 
-def timefromptp(p, leapyear=False):
+def utcfromtimestamp(i):
+	x = timedelta(seconds=i)
+	return x
+
+def timefromptp(p, leapyear=0):
 	total_seconds = (p >> 32)
 	t = datetime.datetime.utcfromtimestamp(total_seconds)
-	if isinstance(leapyear, int):
-		total_seconds -= leapyear
-	elif leapyear:
+	
+	if leapyear <= -1:
 		total_seconds -= getLeapYear(t)
+	else:
+		total_seconds -= leapyear
 	x = p & 0xffffffff
 	#seconds = seconds + x/1000000000.0
 	u = int(x/1000)

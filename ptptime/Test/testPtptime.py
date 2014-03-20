@@ -1,18 +1,11 @@
 # -*- coding: utf-8 -*-
-import units.database as database
 import os
 import sys
 import shutil
 import datetime
 import unittest
-
-def checkUnit(unit, c, verified=0, magnitude=0):
-	c['verified']  = verified
-	c['magnitude'] = magnitude
-	for k in c.keys():
-		ret_val = getattr(unit, k)
-		if not c[k] == ret_val:
-			assert False, "Wrong value returned: {0} : {1}".format(c[k], ret_val)
+import ptptime.ptptime as ptptime
+from ptptime.Test.utils import checkAttributes
 
 class TestPtptime(unittest.TestCase):
 	
@@ -26,273 +19,730 @@ class TestPtptime(unittest.TestCase):
 	def test_b(self):
 		assert 'b' == 'b'
 
-# 	def testFileCreation(self):
-# 		workdir = self.workdir
-# 		dbname = 'units'
-# 		dbfile = '{0}/{1}_{2}.sqlite'.format(workdir, dbname, sys.version_info[0])
-# 		if os.path.isfile(dbfile):
-# 			assert False, "File present: {0}".format(dbfile)
-# 	
-# 		session = database.setupDB(workdir, dbname)
-# 		session.close()
+	def testPTPAddition(self):
+		d = {'year': 1972, 'month': 11 , 'day': 12, 'hour': 16, 'minute': 24, 'second': 34, 'microsecond': 123456, 'nanosecond': 0, 'leapyear': False}
+		t = ptptime.ptptime(d['year'],d['month'],d['day'],d['hour'],d['minute'],d['second'],d['microsecond'])
+		checkAttributes(t, d)
+		tn = t + ptptime.timedelta(days=1)
+		d['day'] = 13
+		checkAttributes(tn, d)
+		if not str(tn) == "1972-11-13 16:24:34.123456:000":
+				assert False, "Incorrect Time Formatting: '{0}'".format(str(tn))
+
+		d = {'year': 1972, 'month': 11 , 'day': 12, 'hour': 16, 'minute': 24, 'second': 34, 'microsecond': 123456, 'nanosecond': 0, 'leapyear': False}
+		t = ptptime.ptptime(d['year'],d['month'],d['day'],d['hour'],d['minute'],d['second'],d['microsecond'])
+		checkAttributes(t, d)
+		tn = t + ptptime.timedelta(hours=1)
+		d['hour'] = 17
+		checkAttributes(tn, d)
+		if not str(tn) == "1972-11-12 17:24:34.123456:000":
+				assert False, "Incorrect Time Formatting: '{0}'".format(str(tn))
+
+		d = {'year': 1972, 'month': 11 , 'day': 12, 'hour': 16, 'minute': 24, 'second': 34, 'microsecond': 123456, 'nanosecond': 0, 'leapyear': False}
+		t = ptptime.ptptime(d['year'],d['month'],d['day'],d['hour'],d['minute'],d['second'],d['microsecond'])
+		checkAttributes(t, d)
+		tn = t + ptptime.timedelta(minutes=1)
+		d['minute'] = 25
+		checkAttributes(tn, d)
+		if not str(tn) == "1972-11-12 16:25:34.123456:000":
+				assert False, "Incorrect Time Formatting: '{0}'".format(str(tn))
+
+		d = {'year': 1972, 'month': 11 , 'day': 12, 'hour': 16, 'minute': 24, 'second': 34, 'microsecond': 123456, 'nanosecond': 0, 'leapyear': False}
+		t = ptptime.ptptime(d['year'],d['month'],d['day'],d['hour'],d['minute'],d['second'],d['microsecond'])
+		checkAttributes(t, d)
+		tn = t + ptptime.timedelta(seconds=1)
+		d['second'] = 35
+		checkAttributes(tn, d)
+		if not str(tn) == "1972-11-12 16:24:35.123456:000":
+				assert False, "Incorrect Time Formatting: '{0}'".format(str(tn))
+
+
+		d = {'year': 1972, 'month': 11 , 'day': 12, 'hour': 16, 'minute': 24, 'second': 34, 'microsecond': 123456, 'nanosecond': 0, 'leapyear': False}
+		t = ptptime.ptptime(d['year'],d['month'],d['day'],d['hour'],d['minute'],d['second'],d['microsecond'])
+		checkAttributes(t, d)
+		tn = t + ptptime.timedelta(microseconds=1)
+		d['microsecond'] = 123457
+		checkAttributes(tn, d)
+		if not str(tn) == "1972-11-12 16:24:34.123457:000":
+				assert False, "Incorrect Time Formatting: '{0}'".format(str(tn))
+
+
+		d = {'year': 1972, 'month': 11 , 'day': 12, 'hour': 16, 'minute': 24, 'second': 34, 'microsecond': 123456, 'nanosecond': 0, 'leapyear': False}
+		t = ptptime.ptptime(d['year'],d['month'],d['day'],d['hour'],d['minute'],d['second'],d['microsecond'])
+		checkAttributes(t, d)
+		tn = t + ptptime.timedelta(nanoseconds=1)
+		d['nanosecond'] = 1
+		checkAttributes(tn, d)
+		if not str(tn) == "1972-11-12 16:24:34.123456:001":
+				assert False, "Incorrect Time Formatting: '{0}'".format(str(tn))
+
+		d = {'year': 1972, 'month': 11 , 'day': 12, 'hour': 16, 'minute': 24, 'second': 34, 'microsecond': 123456, 'nanosecond': 0, 'leapyear': False}
+		t = ptptime.ptptime(d['year'],d['month'],d['day'],d['hour'],d['minute'],d['second'],d['microsecond'])
+		checkAttributes(t, d)
+		tn = t + ptptime.timedelta(nanoseconds=999)
+		d['nanosecond'] = 999
+		checkAttributes(tn, d)
+		if not str(tn) == "1972-11-12 16:24:34.123456:999":
+				assert False, "Incorrect Time Formatting: '{0}'".format(str(tn))
+
+		d = {'year': 1972, 'month': 11 , 'day': 12, 'hour': 16, 'minute': 24, 'second': 34, 'microsecond': 123456, 'nanosecond': 0, 'leapyear': False}
+		t = ptptime.ptptime(d['year'],d['month'],d['day'],d['hour'],d['minute'],d['second'],d['microsecond'])
+		checkAttributes(t, d)
+		tn = t + ptptime.timedelta(nanoseconds=1000)
+		d['nanosecond'] = 0
+		d['microsecond'] = 123457
+		checkAttributes(tn, d)
+		if not str(tn) == "1972-11-12 16:24:34.123457:000":
+				assert False, "Incorrect Time Formatting: '{0}'".format(str(tn))
+
+		d = {'year': 1972, 'month': 11 , 'day': 12, 'hour': 16, 'minute': 24, 'second': 34, 'microsecond': 123456, 'nanosecond': 0, 'leapyear': False}
+		t = ptptime.ptptime(d['year'],d['month'],d['day'],d['hour'],d['minute'],d['second'],d['microsecond'])
+		checkAttributes(t, d)
+		tn = t + ptptime.timedelta(nanoseconds=1001)
+		d['nanosecond'] = 1
+		d['microsecond'] = 123457
+		checkAttributes(tn, d)
+		if not str(tn) == "1972-11-12 16:24:34.123457:001":
+				assert False, "Incorrect Time Formatting: '{0}'".format(str(tn))
+
+		d = {'year': 1972, 'month': 11 , 'day': 12, 'hour': 16, 'minute': 24, 'second': 34, 'microsecond': 999999, 'nanosecond': 0, 'leapyear': False}
+		t = ptptime.ptptime(d['year'],d['month'],d['day'],d['hour'],d['minute'],d['second'],d['microsecond'])
+		checkAttributes(t, d)
+		tn = t + ptptime.timedelta(nanoseconds=1001)
+		d['nanosecond'] = 1
+		d['microsecond'] = 0
+		d['second'] = 35
+		checkAttributes(tn, d)
+		if not str(tn) == "1972-11-12 16:24:35.000000:001":
+				assert False, "Incorrect Time Formatting: '{0}'".format(str(tn))
+
+		d = {'year': 1972, 'month': 11 , 'day': 12, 'hour': 16, 'minute': 24, 'second': 34, 'microsecond': 123456, 'nanosecond': 1, 'leapyear': False}
+		t = ptptime.ptptime(d['year'],d['month'],d['day'],d['hour'],d['minute'],d['second'],d['microsecond'], d['nanosecond'])
+		checkAttributes(t, d)
+		tn = t + ptptime.timedelta(nanoseconds=1)
+		d['nanosecond'] = 2
+		checkAttributes(tn, d)
+		if not str(tn) == "1972-11-12 16:24:34.123456:002":
+				assert False, "Incorrect Time Formatting: '{0}'".format(str(tn))
+
+		d = {'year': 1972, 'month': 11 , 'day': 12, 'hour': 16, 'minute': 24, 'second': 34, 'microsecond': 123456, 'nanosecond': 501, 'leapyear': False}
+		t = ptptime.ptptime(d['year'],d['month'],d['day'],d['hour'],d['minute'],d['second'],d['microsecond'], d['nanosecond'])
+		checkAttributes(t, d)
+		tn = t + ptptime.timedelta(nanoseconds=501)
+		d['nanosecond'] = 2
+		d['microsecond'] = 123457
+		checkAttributes(tn, d)
+		if not str(tn) == "1972-11-12 16:24:34.123457:002":
+				assert False, "Incorrect Time Formatting: '{0}'".format(str(tn))
+
+		d = {'year': 1972, 'month': 11 , 'day': 12, 'hour': 16, 'minute': 24, 'second': 34, 'microsecond': 123456, 'nanosecond': 1, 'leapyear': False}
+		t = ptptime.ptptime(d['year'],d['month'],d['day'],d['hour'],d['minute'],d['second'],d['microsecond'], nanosecond=d['nanosecond'])
+		checkAttributes(t, d)
+		tn = t + ptptime.timedelta(nanoseconds=1)
+		d['nanosecond'] = 2
+		checkAttributes(tn, d)
+		if not str(tn) == "1972-11-12 16:24:34.123456:002":
+				assert False, "Incorrect Time Formatting: '{0}'".format(str(tn))
+
+		d = {'year': 1972, 'month': 11 , 'day': 12, 'hour': 16, 'minute': 24, 'second': 34, 'microsecond': 123456, 'nanosecond': 501, 'leapyear': False}
+		t = ptptime.ptptime(d['year'],d['month'],d['day'],d['hour'],d['minute'],d['second'],d['microsecond'], nanosecond=d['nanosecond'])
+		checkAttributes(t, d)
+		tn = t + ptptime.timedelta(nanoseconds=501)
+		d['nanosecond'] = 2
+		d['microsecond'] = 123457
+		checkAttributes(tn, d)
+		if not str(tn) == "1972-11-12 16:24:34.123457:002":
+				assert False, "Incorrect Time Formatting: '{0}'".format(str(tn))
+
+	def testPTPSubtraction(self):
+		d = {'year': 1972, 'month': 11 , 'day': 12, 'hour': 16, 'minute': 24, 'second': 34, 'microsecond': 123456, 'nanosecond': 0, 'leapyear': False}
+		t = ptptime.ptptime(d['year'],d['month'],d['day'],d['hour'],d['minute'],d['second'],d['microsecond'])
+		checkAttributes(t, d)
+		tn = t - ptptime.timedelta(days=1)
+		d['day'] = 11
+		checkAttributes(tn, d)
+		if not str(tn) == "1972-11-11 16:24:34.123456:000":
+				assert False, "Incorrect Time Formatting: '{0}'".format(str(tn))
+
+		d = {'year': 1972, 'month': 11 , 'day': 12, 'hour': 16, 'minute': 24, 'second': 34, 'microsecond': 123456, 'nanosecond': 0, 'leapyear': False}
+		t = ptptime.ptptime(d['year'],d['month'],d['day'],d['hour'],d['minute'],d['second'],d['microsecond'])
+		checkAttributes(t, d)
+		tn = t - ptptime.timedelta(hours=1)
+		d['hour'] = 15
+		checkAttributes(tn, d)
+		if not str(tn) == "1972-11-12 15:24:34.123456:000":
+				assert False, "Incorrect Time Formatting: '{0}'".format(str(tn))
+
+		d = {'year': 1972, 'month': 11 , 'day': 12, 'hour': 16, 'minute': 24, 'second': 34, 'microsecond': 123456, 'nanosecond': 0, 'leapyear': False}
+		t = ptptime.ptptime(d['year'],d['month'],d['day'],d['hour'],d['minute'],d['second'],d['microsecond'])
+		checkAttributes(t, d)
+		tn = t - ptptime.timedelta(minutes=1)
+		d['minute'] = 23
+		checkAttributes(tn, d)
+		if not str(tn) == "1972-11-12 16:23:34.123456:000":
+				assert False, "Incorrect Time Formatting: '{0}'".format(str(tn))
+
+		d = {'year': 1972, 'month': 11 , 'day': 12, 'hour': 16, 'minute': 24, 'second': 34, 'microsecond': 123456, 'nanosecond': 0, 'leapyear': False}
+		t = ptptime.ptptime(d['year'],d['month'],d['day'],d['hour'],d['minute'],d['second'],d['microsecond'])
+		checkAttributes(t, d)
+		tn = t - ptptime.timedelta(seconds=1)
+		d['second'] = 33
+		checkAttributes(tn, d)
+		if not str(tn) == "1972-11-12 16:24:33.123456:000":
+				assert False, "Incorrect Time Formatting: '{0}'".format(str(tn))
+
+
+		d = {'year': 1972, 'month': 11 , 'day': 12, 'hour': 16, 'minute': 24, 'second': 34, 'microsecond': 123456, 'nanosecond': 0, 'leapyear': False}
+		t = ptptime.ptptime(d['year'],d['month'],d['day'],d['hour'],d['minute'],d['second'],d['microsecond'])
+		checkAttributes(t, d)
+		tn = t - ptptime.timedelta(microseconds=1)
+		d['microsecond'] = 123455
+		checkAttributes(tn, d)
+		if not str(tn) == "1972-11-12 16:24:34.123455:000":
+				assert False, "Incorrect Time Formatting: '{0}'".format(str(tn))
+
+
+		d = {'year': 1972, 'month': 11 , 'day': 12, 'hour': 16, 'minute': 24, 'second': 34, 'microsecond': 123456, 'nanosecond': 54, 'leapyear': False}
+		t = ptptime.ptptime(d['year'],d['month'],d['day'],d['hour'],d['minute'],d['second'],d['microsecond'],d['nanosecond'])
+		checkAttributes(t, d)
+		tn = t - ptptime.timedelta(nanoseconds=1)
+		d['nanosecond'] = 53
+		checkAttributes(tn, d)
+		if not str(tn) == "1972-11-12 16:24:34.123456:053":
+				assert False, "Incorrect Time Formatting: '{0}'".format(str(tn))
+
+		d = {'year': 1972, 'month': 11 , 'day': 12, 'hour': 16, 'minute': 24, 'second': 34, 'microsecond': 123456, 'nanosecond': 0, 'leapyear': False}
+		t = ptptime.ptptime(d['year'],d['month'],d['day'],d['hour'],d['minute'],d['second'],d['microsecond'],d['nanosecond'])
+		checkAttributes(t, d)
+		tn = t - ptptime.timedelta(nanoseconds=1)
+		d['nanosecond'] = 999
+		d['microsecond'] = 123455
+		checkAttributes(tn, d)
+		if not str(tn) == "1972-11-12 16:24:34.123455:999":
+				assert False, "Incorrect Time Formatting: '{0}'".format(str(tn))
+
+		d = {'year': 1972, 'month': 11 , 'day': 12, 'hour': 16, 'minute': 24, 'second': 34, 'microsecond': 0, 'nanosecond': 0, 'leapyear': False}
+		t = ptptime.ptptime(d['year'],d['month'],d['day'],d['hour'],d['minute'],d['second'],d['microsecond'],d['nanosecond'])
+		checkAttributes(t, d)
+		tn = t - ptptime.timedelta(nanoseconds=1)
+		d['nanosecond'] = 999
+		d['microsecond'] = 999999
+		d['second'] = 33
+		checkAttributes(tn, d)
+		if not str(tn) == "1972-11-12 16:24:33.999999:999":
+				assert False, "Incorrect Time Formatting: '{0}'".format(str(tn))
+
+		d = {'year': 1972, 'month': 11 , 'day': 12, 'hour': 16, 'minute': 24, 'second': 0, 'microsecond': 0, 'nanosecond': 0, 'leapyear': False}
+		t = ptptime.ptptime(d['year'],d['month'],d['day'],d['hour'],d['minute'],d['second'],d['microsecond'],d['nanosecond'])
+		checkAttributes(t, d)
+		tn = t - ptptime.timedelta(nanoseconds=1)
+		d['nanosecond'] = 999
+		d['microsecond'] = 999999
+		d['second'] = 59
+		d['minute'] = 23
+		checkAttributes(tn, d)
+		if not str(tn) == "1972-11-12 16:23:59.999999:999":
+				assert False, "Incorrect Time Formatting: '{0}'".format(str(tn))
+
+		d = {'year': 1972, 'month': 11 , 'day': 12, 'hour': 16, 'minute': 0, 'second': 0, 'microsecond': 0, 'nanosecond': 0, 'leapyear': False}
+		t = ptptime.ptptime(d['year'],d['month'],d['day'],d['hour'],d['minute'],d['second'],d['microsecond'],d['nanosecond'])
+		checkAttributes(t, d)
+		tn = t - ptptime.timedelta(nanoseconds=1)
+		d['nanosecond'] = 999
+		d['microsecond'] = 999999
+		d['second'] = 59
+		d['minute'] = 59
+		d['hour'] = 15
+		checkAttributes(tn, d)
+		if not str(tn) == "1972-11-12 15:59:59.999999:999":
+				assert False, "Incorrect Time Formatting: '{0}'".format(str(tn))
+
+		d = {'year': 1972, 'month': 11 , 'day': 12, 'hour': 0, 'minute': 0, 'second': 0, 'microsecond': 0, 'nanosecond': 0, 'leapyear': False}
+		t = ptptime.ptptime(d['year'],d['month'],d['day'],d['hour'],d['minute'],d['second'],d['microsecond'],d['nanosecond'])
+		checkAttributes(t, d)
+		tn = t - ptptime.timedelta(nanoseconds=1)
+		d['nanosecond'] = 999
+		d['microsecond'] = 999999
+		d['second'] = 59
+		d['minute'] = 59
+		d['hour'] = 23
+		d['day'] = 11
+		checkAttributes(tn, d)
+		if not str(tn) == "1972-11-11 23:59:59.999999:999":
+				assert False, "Incorrect Time Formatting: '{0}'".format(str(tn))
+
+		d = {'year': 1972, 'month': 11 , 'day': 1, 'hour': 0, 'minute': 0, 'second': 0, 'microsecond': 0, 'nanosecond': 0, 'leapyear': False}
+		t = ptptime.ptptime(d['year'],d['month'],d['day'],d['hour'],d['minute'],d['second'],d['microsecond'],d['nanosecond'])
+		checkAttributes(t, d)
+		tn = t - ptptime.timedelta(nanoseconds=1)
+		d['nanosecond'] = 999
+		d['microsecond'] = 999999
+		d['second'] = 59
+		d['minute'] = 59
+		d['hour'] = 23
+		d['day'] = 31
+		d['month'] = 10
+		checkAttributes(tn, d)
+		if not str(tn) == "1972-10-31 23:59:59.999999:999":
+				assert False, "Incorrect Time Formatting: '{0}'".format(str(tn))
+
+		d = {'year': 1972, 'month': 1 , 'day': 1, 'hour': 0, 'minute': 0, 'second': 0, 'microsecond': 0, 'nanosecond': 0, 'leapyear': False}
+		t = ptptime.ptptime(d['year'],d['month'],d['day'],d['hour'],d['minute'],d['second'],d['microsecond'],d['nanosecond'])
+		checkAttributes(t, d)
+		tn = t - ptptime.timedelta(nanoseconds=1)
+		d['nanosecond'] = 999
+		d['microsecond'] = 999999
+		d['second'] = 59
+		d['minute'] = 59
+		d['hour'] = 23
+		d['day'] = 31
+		d['month'] = 12
+		d['year'] = 1971
+		checkAttributes(tn, d)
+		if not str(tn) == "1971-12-31 23:59:59.999999:999":
+				assert False, "Incorrect Time Formatting: '{0}'".format(str(tn))
+
+		d = {'year': 1970, 'month': 1 , 'day': 1, 'hour': 0, 'minute': 0, 'second': 0, 'microsecond': 0, 'nanosecond': 0, 'leapyear': False}
+		t = ptptime.ptptime(d['year'],d['month'],d['day'],d['hour'],d['minute'],d['second'],d['microsecond'],d['nanosecond'])
+		checkAttributes(t, d)
+		tn = t - ptptime.timedelta(nanoseconds=1)
+		d['nanosecond'] = 999
+		d['microsecond'] = 999999
+		d['second'] = 59
+		d['minute'] = 59
+		d['hour'] = 23
+		d['day'] = 31
+		d['month'] = 12
+		d['year'] = 1969
+		checkAttributes(tn, d)
+		if not str(tn) == "1969-12-31 23:59:59.999999:999":
+				assert False, "Incorrect Time Formatting: '{0}'".format(str(tn))
+
+		d = {'year': 1972, 'month': 1 , 'day': 1, 'hour': 0, 'minute': 0, 'second': 0, 'microsecond': 0, 'nanosecond': 0, 'leapyear': False}
+		t = ptptime.ptptime(d['year'],d['month'],d['day'],d['hour'],d['minute'],d['second'],d['microsecond'],d['nanosecond'])
+		checkAttributes(t, d)
+		tn = t - ptptime.timedelta(nanoseconds=1001)
+		d['nanosecond'] = 999
+		d['microsecond'] = 999998
+		d['second'] = 59
+		d['minute'] = 59
+		d['hour'] = 23
+		d['day'] = 31
+		d['month'] = 12
+		d['year'] = 1971
+		checkAttributes(tn, d)
+		if not str(tn) == "1971-12-31 23:59:59.999998:999":
+				assert False, "Incorrect Time Formatting: '{0}'".format(str(tn))
+
+		d = {'year': 1972, 'month': 1 , 'day': 1, 'hour': 0, 'minute': 0, 'second': 0, 'microsecond': 0, 'nanosecond': 501, 'leapyear': False}
+		t = ptptime.ptptime(d['year'],d['month'],d['day'],d['hour'],d['minute'],d['second'],d['microsecond'],d['nanosecond'])
+		checkAttributes(t, d)
+		tn = t - ptptime.timedelta(nanoseconds=1002)
+		d['nanosecond'] = 499
+		d['microsecond'] = 999999
+		d['second'] = 59
+		d['minute'] = 59
+		d['hour'] = 23
+		d['day'] = 31
+		d['month'] = 12
+		d['year'] = 1971
+		checkAttributes(tn, d)
+		if not str(tn) == "1971-12-31 23:59:59.999999:499":
+				assert False, "Incorrect Time Formatting: '{0}'".format(str(tn))
 # 
-# 		if not os.path.isfile(dbfile):
-# 			assert False, "File missing: {0}".format(dbfile)
+# 		d = {'year': 1972, 'month': 11 , 'day': 12, 'hour': 16, 'minute': 24, 'second': 34, 'microsecond': 123456, 'nanosecond': 0, 'leapyear': False}
+# 		t = ptptime.ptptime(d['year'],d['month'],d['day'],d['hour'],d['minute'],d['second'],d['microsecond'])
+# 		checkAttributes(t, d)
+# 		tn = t + ptptime.timedelta(nanoseconds=999)
+# 		d['nanosecond'] = 999
+# 		checkAttributes(tn, d)
+# 		if not str(tn) == "1972-11-12 16:24:34.123456:999":
+# 				assert False, "Incorrect Time Formatting: '{0}'".format(str(tn))
 # 
-# 	def testUnitAdd(self):
-# 		workdir = self.workdir
-# 		dbname = 'units'
-# 		dbfile = '{0}/{1}_{2}.sqlite'.format(workdir, dbname, sys.version_info[0])
-# 		session = database.setupDB(workdir, dbname)
-# 		session.close()
+# 		d = {'year': 1972, 'month': 11 , 'day': 12, 'hour': 16, 'minute': 24, 'second': 34, 'microsecond': 123456, 'nanosecond': 0, 'leapyear': False}
+# 		t = ptptime.ptptime(d['year'],d['month'],d['day'],d['hour'],d['minute'],d['second'],d['microsecond'])
+# 		checkAttributes(t, d)
+# 		tn = t + ptptime.timedelta(nanoseconds=1000)
+# 		d['nanosecond'] = 0
+# 		d['microsecond'] = 123457
+# 		checkAttributes(tn, d)
+# 		if not str(tn) == "1972-11-12 16:24:34.123457:000":
+# 				assert False, "Incorrect Time Formatting: '{0}'".format(str(tn))
+# 
+# 		d = {'year': 1972, 'month': 11 , 'day': 12, 'hour': 16, 'minute': 24, 'second': 34, 'microsecond': 123456, 'nanosecond': 0, 'leapyear': False}
+# 		t = ptptime.ptptime(d['year'],d['month'],d['day'],d['hour'],d['minute'],d['second'],d['microsecond'])
+# 		checkAttributes(t, d)
+# 		tn = t + ptptime.timedelta(nanoseconds=1001)
+# 		d['nanosecond'] = 1
+# 		d['microsecond'] = 123457
+# 		checkAttributes(tn, d)
+# 		if not str(tn) == "1972-11-12 16:24:34.123457:001":
+# 				assert False, "Incorrect Time Formatting: '{0}'".format(str(tn))
+# 
+# 		d = {'year': 1972, 'month': 11 , 'day': 12, 'hour': 16, 'minute': 24, 'second': 34, 'microsecond': 999999, 'nanosecond': 0, 'leapyear': False}
+# 		t = ptptime.ptptime(d['year'],d['month'],d['day'],d['hour'],d['minute'],d['second'],d['microsecond'])
+# 		checkAttributes(t, d)
+# 		tn = t + ptptime.timedelta(nanoseconds=1001)
+# 		d['nanosecond'] = 1
+# 		d['microsecond'] = 0
+# 		d['second'] = 35
+# 		checkAttributes(tn, d)
+# 		if not str(tn) == "1972-11-12 16:24:35.000000:001":
+# 				assert False, "Incorrect Time Formatting: '{0}'".format(str(tn))
+# 
+# 		d = {'year': 1972, 'month': 11 , 'day': 12, 'hour': 16, 'minute': 24, 'second': 34, 'microsecond': 123456, 'nanosecond': 1, 'leapyear': False}
+# 		t = ptptime.ptptime(d['year'],d['month'],d['day'],d['hour'],d['minute'],d['second'],d['microsecond'], d['nanosecond'])
+# 		checkAttributes(t, d)
+# 		tn = t + ptptime.timedelta(nanoseconds=1)
+# 		d['nanosecond'] = 2
+# 		checkAttributes(tn, d)
+# 		if not str(tn) == "1972-11-12 16:24:34.123456:002":
+# 				assert False, "Incorrect Time Formatting: '{0}'".format(str(tn))
+# 
+# 		d = {'year': 1972, 'month': 11 , 'day': 12, 'hour': 16, 'minute': 24, 'second': 34, 'microsecond': 123456, 'nanosecond': 501, 'leapyear': False}
+# 		t = ptptime.ptptime(d['year'],d['month'],d['day'],d['hour'],d['minute'],d['second'],d['microsecond'], d['nanosecond'])
+# 		checkAttributes(t, d)
+# 		tn = t + ptptime.timedelta(nanoseconds=501)
+# 		d['nanosecond'] = 2
+# 		d['microsecond'] = 123457
+# 		checkAttributes(tn, d)
+# 		if not str(tn) == "1972-11-12 16:24:34.123457:002":
+# 				assert False, "Incorrect Time Formatting: '{0}'".format(str(tn))
+# 
+# 		d = {'year': 1972, 'month': 11 , 'day': 12, 'hour': 16, 'minute': 24, 'second': 34, 'microsecond': 123456, 'nanosecond': 1, 'leapyear': False}
+# 		t = ptptime.ptptime(d['year'],d['month'],d['day'],d['hour'],d['minute'],d['second'],d['microsecond'], nanosecond=d['nanosecond'])
+# 		checkAttributes(t, d)
+# 		tn = t + ptptime.timedelta(nanoseconds=1)
+# 		d['nanosecond'] = 2
+# 		checkAttributes(tn, d)
+# 		if not str(tn) == "1972-11-12 16:24:34.123456:002":
+# 				assert False, "Incorrect Time Formatting: '{0}'".format(str(tn))
+# 
+# 		d = {'year': 1972, 'month': 11 , 'day': 12, 'hour': 16, 'minute': 24, 'second': 34, 'microsecond': 123456, 'nanosecond': 501, 'leapyear': False}
+# 		t = ptptime.ptptime(d['year'],d['month'],d['day'],d['hour'],d['minute'],d['second'],d['microsecond'], nanosecond=d['nanosecond'])
+# 		checkAttributes(t, d)
+# 		tn = t + ptptime.timedelta(nanoseconds=501)
+# 		d['nanosecond'] = 2
+# 		d['microsecond'] = 123457
+# 		checkAttributes(tn, d)
+# 		if not str(tn) == "1972-11-12 16:24:34.123457:002":
+# 				assert False, "Incorrect Time Formatting: '{0}'".format(str(tn))
+
+	def testPTPutcfromtimestamp(self):
+		x0 = ptptime.ptptime(1970,1,1,0,0,0,0,0)
+		x1 = ptptime.ptptime.utcfromtimestamp(0)
+		x2 = x0 - x1
+
+		if not isinstance(x0, ptptime.ptptime):
+			assert False, "Incorrect Instance type: '{0}'".format(str(x0))
+		if not isinstance(x1, ptptime.ptptime):
+			assert False, "Incorrect Instance type: '{0}'".format(str(x1))
+		if not isinstance(x2, ptptime.timedelta):
+			assert False, "Incorrect Instance type: '{0}'".format(str(x2))
+
+		d = {'year': 1970, 'month': 1 , 'day': 1, 'hour': 0, 'minute': 0, 'second': 0, 'microsecond': 0, 'nanosecond': 0, 'leapyear': False}
+		checkAttributes(x1, d)
+
+		d = {'days': 0, 'seconds': 0, 'microseconds': 0, 'nanoseconds': 0}
+		checkAttributes(x2, d)
+		expected = 0
+		if not expected == x0.total_seconds:
+			assert False, "Incorrect Total Seconds: '{0}' expected '{1}'".format(x0.total_seconds, expected)
+		
+
+		x0 = ptptime.ptptime(1970,1,1,0,1,0,0,0)
+		x1 = ptptime.ptptime.utcfromtimestamp(0)
+		x2 = x0 - x1		
+		
+		x0 = ptptime.ptptime(1970,1,1,0,0,1,0,0)
+		x1 = ptptime.ptptime.utcfromtimestamp(0)
+		x2 = x0 - x1
+
+		if not isinstance(x0, ptptime.ptptime):
+			assert False, "Incorrect Instance type: '{0}'".format(str(x0))
+		if not isinstance(x1, ptptime.ptptime):
+			assert False, "Incorrect Instance type: '{0}'".format(str(x1))
+		if not isinstance(x2, ptptime.timedelta):
+			assert False, "Incorrect Instance type: '{0}'".format(str(x2))
+
+		d = {'year': 1970, 'month': 1 , 'day': 1, 'hour': 0, 'minute': 0, 'second': 0, 'microsecond': 0, 'nanosecond': 0, 'leapyear': False}
+		checkAttributes(x1, d)
+
+		d = {'days': 0, 'seconds': 1, 'microseconds': 0, 'nanoseconds': 0}
+		checkAttributes(x2, d)
+		
+		expected = 1
+		if not expected == x0.total_seconds:
+			assert False, "Incorrect Total Seconds: '{0}' expected '{1}'".format(x0.total_seconds, expected)
+
+		x0 = ptptime.ptptime(1970,1,1,0,1,0,0,0)
+		x1 = ptptime.ptptime.utcfromtimestamp(0)
+		x2 = x0 - x1		
+
+		if not isinstance(x0, ptptime.ptptime):
+			assert False, "Incorrect Instance type: '{0}'".format(str(x0))
+		if not isinstance(x1, ptptime.ptptime):
+			assert False, "Incorrect Instance type: '{0}'".format(str(x1))
+		if not isinstance(x2, ptptime.timedelta):
+			assert False, "Incorrect Instance type: '{0}'".format(str(x2))
+
+		d = {'days': 0, 'seconds': 60, 'microseconds': 0, 'nanoseconds': 0}
+		checkAttributes(x2, d)
+		
+		expected = 60
+		if not expected == x0.total_seconds:
+			assert False, "Incorrect Total Seconds: '{0}' expected '{1}'".format(x0.total_seconds, expected)
+
+		x0 = ptptime.ptptime(1970,1,1,1,0,0,0,0)
+		x1 = ptptime.ptptime.utcfromtimestamp(0)
+		x2 = x0 - x1
+
+		if not isinstance(x0, ptptime.ptptime):
+			assert False, "Incorrect Instance type: '{0}'".format(str(x0))
+		if not isinstance(x1, ptptime.ptptime):
+			assert False, "Incorrect Instance type: '{0}'".format(str(x1))
+		if not isinstance(x2, ptptime.timedelta):
+			assert False, "Incorrect Instance type: '{0}'".format(str(x2))
+
+		d = {'days': 0, 'seconds': 3600, 'microseconds': 0, 'nanoseconds': 0}
+		checkAttributes(x2, d)
+
+		expected = 3600
+		if not expected == x0.total_seconds:
+			assert False, "Incorrect Total Seconds: '{0}' expected '{1}'".format(x0.total_seconds, expected)
+
+		x0 = ptptime.ptptime(1970,1,2,0,0,0,0,0)
+		x1 = ptptime.ptptime.utcfromtimestamp(0)
+		x2 = x0 - x1
+
+		if not isinstance(x0, ptptime.ptptime):
+			assert False, "Incorrect Instance type: '{0}'".format(str(x0))
+		if not isinstance(x1, ptptime.ptptime):
+			assert False, "Incorrect Instance type: '{0}'".format(str(x1))
+		if not isinstance(x2, ptptime.timedelta):
+			assert False, "Incorrect Instance type: '{0}'".format(str(x2))
+
+		d = {'days': 1, 'seconds': 0, 'microseconds': 0, 'nanoseconds': 0}
+		checkAttributes(x2, d)
+
+		expected = 86400
+		if not expected == x0.total_seconds:
+			assert False, "Incorrect Total Seconds: '{0}' expected '{1}'".format(x0.total_seconds, expected)
+
+		x0 = ptptime.ptptime(1970,2,1,0,0,0,0,0)
+		x1 = ptptime.ptptime.utcfromtimestamp(0)
+		x2 = x0 - x1
+
+		if not isinstance(x0, ptptime.ptptime):
+			assert False, "Incorrect Instance type: '{0}'".format(str(x0))
+		if not isinstance(x1, ptptime.ptptime):
+			assert False, "Incorrect Instance type: '{0}'".format(str(x1))
+		if not isinstance(x2, ptptime.timedelta):
+			assert False, "Incorrect Instance type: '{0}'".format(str(x2))
+
+		d = {'days': 31, 'seconds': 0, 'microseconds': 0, 'nanoseconds': 0}
+		checkAttributes(x2, d)
+
+		expected = 2678400
+		if not expected == x0.total_seconds:
+			assert False, "Incorrect Total Seconds: '{0}' expected '{1}'".format(x0.total_seconds, expected)
+
+		x0 = ptptime.ptptime(1971,1,1,0,0,0,0,0)
+		x1 = ptptime.ptptime.utcfromtimestamp(0)
+		x2 = x0 - x1
+
+		if not isinstance(x0, ptptime.ptptime):
+			assert False, "Incorrect Instance type: '{0}'".format(str(x0))
+		if not isinstance(x1, ptptime.ptptime):
+			assert False, "Incorrect Instance type: '{0}'".format(str(x1))
+		if not isinstance(x2, ptptime.timedelta):
+			assert False, "Incorrect Instance type: '{0}'".format(str(x2))
+
+		d = {'days': 365, 'seconds': 0, 'microseconds': 0, 'nanoseconds': 0}
+		checkAttributes(x2, d)
+
+		expected = 31536000
+		if not expected == x0.total_seconds:
+			assert False, "Incorrect Total Seconds: '{0}' expected '{1}'".format(x0.total_seconds, expected)
+
+		x0 = ptptime.ptptime(1971,2,2,1,1,1,1,1)
+		x1 = ptptime.ptptime.utcfromtimestamp(0)
+		x2 = x0 - x1
+
+		if not isinstance(x0, ptptime.ptptime):
+			assert False, "Incorrect Instance type: '{0}'".format(str(x0))
+		if not isinstance(x1, ptptime.ptptime):
+			assert False, "Incorrect Instance type: '{0}'".format(str(x1))
+		if not isinstance(x2, ptptime.timedelta):
+			assert False, "Incorrect Instance type: '{0}'".format(str(x2))
+
+		d = {'year': 1970, 'month': 1 , 'day': 1, 'hour': 0, 'minute': 0, 'second': 0, 'microsecond': 0, 'nanosecond': 0, 'leapyear': False}
+		checkAttributes(x1, d)
+
+		d = {'days': 397, 'seconds': 3661, 'microseconds': 1, 'nanoseconds': 1}
+		checkAttributes(x2, d)
+		x0 = ptptime.ptptime(1971,2,2,1,1,1,1,1001)
+		x1 = ptptime.ptptime.utcfromtimestamp(0)
+		x2 = x0 - x1
+
+		if not isinstance(x0, ptptime.ptptime):
+			assert False, "Incorrect Instance type: '{0}'".format(str(x0))
+		if not isinstance(x1, ptptime.ptptime):
+			assert False, "Incorrect Instance type: '{0}'".format(str(x1))
+		if not isinstance(x2, ptptime.timedelta):
+			assert False, "Incorrect Instance type: '{0}'".format(str(x2))
+
+		d = {'year': 1970, 'month': 1 , 'day': 1, 'hour': 0, 'minute': 0, 'second': 0, 'microsecond': 0, 'nanosecond': 0, 'leapyear': False}
+		checkAttributes(x1, d)
+
+		d = {'days': 397, 'seconds': 3661, 'microseconds': 2, 'nanoseconds': 1}
+		checkAttributes(x2, d)
+
+		x0 = ptptime.ptptime(1971,2,2,1,1,1,999999,1001)
+		x1 = ptptime.ptptime.utcfromtimestamp(0)
+		x2 = x0 - x1
+
+		if not isinstance(x0, ptptime.ptptime):
+			assert False, "Incorrect Instance type: '{0}'".format(str(x0))
+		if not isinstance(x1, ptptime.ptptime):
+			assert False, "Incorrect Instance type: '{0}'".format(str(x1))
+		if not isinstance(x2, ptptime.timedelta):
+			assert False, "Incorrect Instance type: '{0}'".format(str(x2))
+
+		d = {'year': 1970, 'month': 1 , 'day': 1, 'hour': 0, 'minute': 0, 'second': 0, 'microsecond': 0, 'nanosecond': 0, 'leapyear': False}
+		checkAttributes(x1, d)
+
+		d = {'days': 397, 'seconds': 3662, 'microseconds': 0, 'nanoseconds': 1}
+		checkAttributes(x2, d)
+		
+
+	def testPTPTimeCheck(self):
+		t = ptptime.ptptime(1970,1,1,0,0,0,0,0)
+		if not t.ptp == 0x0000000000000000:
+				assert False, "Incorrect PTP value: '0x{0:016x}'".format(t.ptp)
+		t = ptptime.ptptime(1970,1,1,0,0,1,0,0)
+		if not t.ptp == 0x0000000100000000:
+				assert False, "Incorrect PTP value: '0x{0:016x}'".format(t.ptp)
+		t = ptptime.ptptime(1970,1,1,0,1,0,0,0)
+		if not t.ptp == 0x0000003c00000000:
+				assert False, "Incorrect PTP value: '0x{0:016x}'".format(t.ptp)
+		t = ptptime.ptptime(1970,1,1,1,0,0,0,0)
+		if not t.ptp == 0x00000e1000000000:
+				assert False, "Incorrect PTP value: '0x{0:016x}'".format(t.ptp)
+		t = ptptime.ptptime(1970,1,2,0,0,0,0,0)
+		if not t.ptp == 0x0001518000000000:
+				assert False, "Incorrect PTP value: '0x{0:016x}'".format(t.ptp)
+		t = ptptime.ptptime(1970,2,1,0,0,0,0,0)
+		if not t.ptp == 0x0028de8000000000:
+				assert False, "Incorrect PTP value: '0x{0:016x}'".format(t.ptp)
+		t = ptptime.ptptime(1971,1,1,0,0,0,0,0)
+		if not t.ptp == 0x01e1338000000000:
+				assert False, "Incorrect PTP value: '0x{0:016x}'".format(t.ptp)
+		t = ptptime.ptptime(2000,1,1,0,0,0,0,0)
+		expected = 0x386d438000000000
+		if not t.ptp == expected:
+				assert False, "Incorrect PTP value: 0x{0:016x}, expected 0x{1:016x}".format(t.ptp, expected)
+		
+	def testPTPCreation(self):
+		
+		d = {'year': 2000, 'month': 1 , 'day': 1, 'hour': 0, 'minute': 0, 'second': 0, 'microsecond': 0, 'nanosecond': 0, 'leapyear': False}
+		
+		t = ptptime.ptptime(d['year'],d['month'],d['day'],d['hour'],d['minute'],d['second'],d['microsecond'])
+		checkAttributes(t, d)
+		
+		if not str(t) == "2000-1-1 00:00:00.000000:000":
+				assert False, "Incorrect Time Formatting: '{0}'".format(str(t))
+
+		if not t.ptp == 0x386d438000000000:
+				assert False, "Incorrect PTP value: '0x{0:016x}'".format(t.ptp)
+		d = {'year': 1972, 'month': 11 , 'day': 12, 'hour': 16, 'minute': 24, 'second': 34, 'microsecond': 123456, 'nanosecond': 0, 'leapyear': False}
+		
+		t = ptptime.ptptime(d['year'],d['month'],d['day'],d['hour'],d['minute'],d['second'],d['microsecond'])
+		checkAttributes(t, d)
+		
+		if not str(t) == "1972-11-12 16:24:34.123456:000":
+				assert False, "Incorrect Time Formatting: '{0}'".format(str(t))
+
+		if not t.ptp == 0x0563e7c2075bca00:
+				assert False, "Incorrect PTP value: '0x{0:016x}'".format(t.ptp)
+		if not t.sbi == 0x04160317cb2434563456:
+				assert False, "Incorrect SBI value: '0x{0:020x}'".format(t.sbi)
+		if not t.iena == 0x18e296f216c0:
+				assert False, "Incorrect IENA value: '0x{0:012x}'".format(t.iena)
+
+# 		x = t.printPTP()
+# 		if not x == "0x0563e7c2075bca00":
+# 				assert False, "Incorrect printPTP: '0x{0:016x}'".format(t.ptp)
 # 		
-# 		res = session.query(database.Units).all()
-# 		if not 0 == len(res):
-# 			assert False, "Incorrect number of values returned: {0}".format(res)
-# 	
-# 		c = {}
-# 		c['device'] = '10.149.8.49'
-# 		c['amount'] = 19.0
-# 		c['unit'] = 'C'
-# 		c['datetime'] = datetime.datetime.now()
-# 	
-# 		database.addUnit(session, c)
-# 
-# 		res = session.query(database.Units).all()
-# 		if not 1 == len(res):
-# 			assert False, "Incorrect number of values returned: {0}".format(res)
-# 	
-# 		unit = res[0]
-# 		checkUnit(unit, c)
-# 			
-# 		# Remove the unit we just added
-# 		database.removeUnit(session, unit)
-# 
-# 		# Database should now be empty.
-# 		res = session.query(database.Units).all()
-# 		if not 0 == len(res):
-# 			assert False, "Incorrect number of values returned: {0}".format(res)
-# 
-# 		c['datetime'] = datetime.datetime.now()
-# 		database.addUnit(session, c)
-# 		c['datetime'] = datetime.datetime.now()
-# 		database.addUnit(session, c)
-# 		
-# 		res = session.query(database.Units).all()
-# 		if not 2 == len(res):
-# 			assert False, "Incorrect number of values returned: {0}".format(res)
-# 
-# 		database.removeUnit(session, res)
-# 
-# 		res = session.query(database.Units).all()
-# 		if not 0 == len(res):
-# 			assert False, "Incorrect number of values returned: {0}".format(res)
-# 
-# 		c['datetime'] = datetime.datetime.now()
-# 		database.addUnit(session, c)
-# 		# We fetch now to use later
-# 		res = session.query(database.Units).all()
-# 
-# 		# This code should trigger an exception
-# 		self.assertRaises(Exception, database.removeUnit, session, 5)
-# 
-# 		# This code effectively does the above, just not as tidy
-# 		# Keep here as an example, for now
-# 		exception_check = False
-# 		try:
-# 			database.removeUnit(session, 5)
-# 		except Exception:
-# 			exception_check = True
-# 		assert exception_check, "Exception was not raised as expected"
-# 
-# 		database.removeUnit(session, res[0])
-# 		
-# 		# This code should trigger an exception as we attepmt
-# 		# to delete a value that was there but is now gone
-# 		self.assertRaises(Exception, database.removeUnit, session, res[0])
-# 
-# 		c['datetime'] = datetime.datetime.now()
-# 		database.addUnit(session, c)
-# 	
-# 		# This code should trigger an exception as we attepmt
-# 		# to write the same value twice
-# 		self.assertRaises(Exception, database.addUnit, session, c)
-# 	
-# 	def testUnitDeltaTrue(self):
-# 		workdir = self.workdir
-# 		dbname = 'units'
-# 		dbfile = '{0}/{1}_{2}.sqlite'.format(workdir, dbname, sys.version_info[0])
-# 		session = database.setupDB(workdir, dbname, delta=True)
-# 		session.close()
-# 		
-# 		d = '10.149.8.49'
-# 		t = datetime.datetime.now()
-# 		
-# 		c = []
-# 		c.append({'device': d, 'amount': 19.0, 'unit': 'C',  'datetime': t})
-# 		c.append({'device': d, 'amount': 50.0, 'unit': 'Hz', 'datetime': t})
-# 		c.append({'device': d, 'amount': 19.0, 'unit': 'C',  'datetime': t + datetime.timedelta(seconds=1)})
-# 		c.append({'device': d, 'amount': 51.0, 'unit': 'Hz', 'datetime': t + datetime.timedelta(seconds=1)})
-# 		c.append({'device': d, 'amount': 51.0, 'unit': 'Hz', 'datetime': t + datetime.timedelta(seconds=2)})
-# 		c.append({'device': d, 'amount': 19.3, 'unit': 'C',  'datetime': t + datetime.timedelta(seconds=3)})
-# 		c.append({'device': d, 'amount': 19.1, 'unit': 'C',  'datetime': t + datetime.timedelta(seconds=2)})
-# 		c.append({'device': d, 'amount': 52.0, 'unit': 'Hz', 'datetime': t + datetime.timedelta(seconds=3)})
-# 		c.append({'device': d, 'amount': 19.3, 'unit': 'C',  'datetime': t + datetime.timedelta(seconds=4)})
-# 		
-# 		database.addUnit(session, c[0])
-# 		database.addUnit(session, c[1])
-# 		database.addUnit(session, c[2])
-# 		database.addUnit(session, c[3])
-# 		database.addUnit(session, c[4])
-# 		database.addUnit(session, c[5])
-# 		database.addUnit(session, c[6])
-# 		database.addUnit(session, c[7])
-# 		database.addUnit(session, c[8])
-# 		
-# 		res = session.query(database.Units).filter(database.Units.unit=='C').all()
-# 		res = sorted(res, key=lambda u: u.datetime)
-# 
-# 		checkUnit(res[0], c[0])
-# 		checkUnit(res[1], c[6])
-# 		checkUnit(res[2], c[5])
-# 
-# 		res = session.query(database.Units).filter(database.Units.unit=='Hz').all()
-# 		res = sorted(res, key=lambda u: u.datetime)
-# 
-# 		checkUnit(res[0], c[1])
-# 		checkUnit(res[1], c[3])
-# 		checkUnit(res[2], c[7])
-# 
-# 	def testUnitDeltaFalse(self):
-# 		workdir = self.workdir
-# 		dbname = 'units'
-# 		dbfile = '{0}/{1}_{2}.sqlite'.format(workdir, dbname, sys.version_info[0])
-# 		session = database.setupDB(workdir, dbname, delta=False)
-# 		session.close()
-# 		
-# 		d = '10.149.8.49'
-# 		t = datetime.datetime.now()
-# 		
-# 		c = []
-# 		c.append({'device': d, 'amount': 19.0, 'unit': 'C',  'datetime': t})
-# 		c.append({'device': d, 'amount': 50.0, 'unit': 'Hz', 'datetime': t})
-# 		c.append({'device': d, 'amount': 19.0, 'unit': 'C',  'datetime': t + datetime.timedelta(seconds=1)})
-# 		c.append({'device': d, 'amount': 51.0, 'unit': 'Hz', 'datetime': t + datetime.timedelta(seconds=1)})
-# 		c.append({'device': d, 'amount': 51.0, 'unit': 'Hz', 'datetime': t + datetime.timedelta(seconds=2)})
-# 		c.append({'device': d, 'amount': 19.3, 'unit': 'C',  'datetime': t + datetime.timedelta(seconds=3)})
-# 		c.append({'device': d, 'amount': 19.1, 'unit': 'C',  'datetime': t + datetime.timedelta(seconds=2)})
-# 		c.append({'device': d, 'amount': 52.0, 'unit': 'Hz', 'datetime': t + datetime.timedelta(seconds=3)})
-# 		c.append({'device': d, 'amount': 19.3, 'unit': 'C',  'datetime': t + datetime.timedelta(seconds=4)})
-# 		
-# 		database.addUnit(session, c[0])
-# 		database.addUnit(session, c[1])
-# 		database.addUnit(session, c[2])
-# 		database.addUnit(session, c[3])
-# 		database.addUnit(session, c[4])
-# 		database.addUnit(session, c[5])
-# 		database.addUnit(session, c[6])
-# 		database.addUnit(session, c[7])
-# 		database.addUnit(session, c[8])
-# 		
-# 		res = session.query(database.Units).filter(database.Units.unit=='C').all()
-# 		res = sorted(res, key=lambda u: u.datetime)
-# 
-# 		checkUnit(res[0], c[0])
-# 		checkUnit(res[1], c[2])
-# 		checkUnit(res[2], c[6])
-# 		checkUnit(res[3], c[5])
-# 		checkUnit(res[4], c[8])
-# 
-# 		res = session.query(database.Units).filter(database.Units.unit=='Hz').all()
-# 		res = sorted(res, key=lambda u: u.datetime)
-# 
-# 		checkUnit(res[0], c[1])
-# 		checkUnit(res[1], c[3])
-# 		checkUnit(res[2], c[4])
-# 		checkUnit(res[3], c[7])
-# 
-# 	def testUpdateVerify(self):
-# 		workdir = self.workdir
-# 		dbname = 'units'
-# 		dbfile = '{0}/{1}_{2}.sqlite'.format(workdir, dbname, sys.version_info[0])
-# 		session = database.setupDB(workdir, dbname)
-# 		session.close()
-# 		
-# 		c = {}
-# 		c['device'] = '10.149.8.49'
-# 		c['amount'] = 19.0
-# 		c['unit'] = 'C'
-# 		c['datetime'] = datetime.datetime.now()
-# 		
-# 		database.addUnit(session, c)
-# 
-# 		u = session.query(database.Units).all()[0]
-# 		checkUnit(u, c, verified=0)
-# 		
-# 		database.unitVerified(session, u)
-# 		u = None
-# 		
-# 		u = session.query(database.Units).all()[0]
-# 		checkUnit(u, c, verified=1)
-# 
-# 		d = {}
-# 		d['device'] = '10.149.8.49'
-# 		d['amount'] = 19.0
-# 		d['unit'] = 'C'
-# 		d['datetime'] = datetime.datetime.now()
-# 		database.addUnit(session, d)
-# 		
-# 		res0 = database.getByVerified(session)
-# 		if not 1 == len(res0):
-# 			assert False, "Incorrect number of values returned: {0}".format(res0)
-# 		u = res0[0]
-# 		checkUnit(u, d, verified=0)
-# 		
-# 		res1 = session.query(database.Units).all()
-# 		if not 2 == len(res1):
-# 			assert False, "Incorrect number of values returned: {0}".format(res1)
-# 		checkUnit(res1[0], c, verified=1)
-# 		checkUnit(res1[1], d, verified=0)
-# 		
-# 		res0 = database.getByVerified(session, verified=1)
-# 		if not 1 == len(res0):
-# 			assert False, "Incorrect number of values returned: {0}".format(res0)
-# 		u = res0[0]
-# 		checkUnit(u, c, verified=1)
-# 		
-# 		database.removeUnit(session, res0)
-# 		
-# 		res0 = session.query(database.Units).all()
-# 		if not 1 == len(res0):
-# 			assert False, "Incorrect number of values returned: {0}".format(res0)
-# 		checkUnit(res0[0], d, verified=0)
-# 
-# # # def testUnitEnum():
-# # # 	global workdir
-# # # 	dbname = 'units'
-# # # 	dbfile = '{0}/{1}_{2}.sqlite'.format(workdir, dbname, sys.version_info[0])
-# # # 	session = database.setupDB(workdir, dbname)
-# # # 	session.close()
-# # # 
-# # # 	c = {}
-# # # 	c['device'] = '10.149.8.49'
-# # # 	c['amount'] = 19.0
-# # # 	c['unit'] = 'C'
-# # # 	c['datetime'] = datetime.datetime.now()
-# # # 	u = database.addUnit(session, c)
-# # # 	
-# # # 	c['unit'] = 'Hz'
-# # # 	u = database.addUnit(session, c)
-# # # 	
-# # # 	c['unit'] = 'elephant'
-# # # 	# This code should trigger an exception as we attepmt
-# # # 	# to write a value with a unknown unit
-# # # 	exception_check = False
-# # # 	try:
-# # # 		u = database.addUnit(session, c)
-# # # 	except Exception:
-# # # 		exception_check = True
-# # # 	assert exception_check, "Exception was not raised as expected"
-# # # 
-# # # testUnitEnum.setUp = setup_test
-# # # testUnitEnum.tearDown = cleanup_after_test
+		d['nanosecond'] = 235
+		t = ptptime.ptptime(d['year'],d['month'],d['day'],d['hour'],d['minute'],d['second'],d['microsecond'],d['nanosecond'])
+		checkAttributes(t, d)
+
+		if not str(t) == "1972-11-12 16:24:34.123456:235":
+				assert False, "Incorrect Time Formatting: '{0}'".format(str(t))
+
+		if not t.ptp == 0x0563e7c2075bcaeb:
+				assert False, "Incorrect PTP value: '0x{0:016x}'".format(t.ptp)
+		if not t.sbi == 0x04160317cb2434563456:
+				assert False, "Incorrect SBI value: '0x{0:020x}'".format(t.sbi)
+		if not t.iena == 0x18e296f216c0:
+				assert False, "Incorrect IENA value: '0x{0:012x}'".format(t.iena)
+		
+		d['nanosecond'] = 123
+		t = ptptime.ptptime(d['year'],d['month'],d['day'],d['hour'],d['minute'],d['second'],d['microsecond'],nanosecond=d['nanosecond'])
+		checkAttributes(t, d)
+
+		if not str(t) == "1972-11-12 16:24:34.123456:123":
+				assert False, "Incorrect Time Formatting: '{0}'".format(str(t))
+
+		if not t.ptp == 0x0563e7c2075bca7b:
+				assert False, "Incorrect PTP value: '0x{0:016x}'".format(t.ptp)
+		if not t.sbi == 0x04160317cb2434563456:
+				assert False, "Incorrect SBI value: '0x{0:020x}'".format(t.sbi)
+		if not t.iena == 0x18e296f216c0:
+				assert False, "Incorrect IENA value: '0x{0:012x}'".format(t.iena)
+		
+
+		d['year'] = 2008
+		d['leapyear'] = True
+		d['nanosecond'] = 0
+		t = ptptime.ptptime(d['year'],d['month'],d['day'],d['hour'],d['minute'],d['second'],d['microsecond'], leapyear=d['leapyear'])
+		checkAttributes(t, d)
+		
+		if not str(t) == "2008-11-12 16:24:34.123456:000":
+				assert False, "Incorrect Time Formatting: '{0}'".format(str(t))
+		
+		if not t.ptp == 0x491b0343075bca00:
+				assert False, "Incorrect PTP value: '0x{0:016x}'".format(t.ptp)
+		if not t.sbi == 0x377303174b2434563456:
+				assert False, "Incorrect SBI value: '0x{0:020x}'".format(t.sbi)
+		if not t.iena == 0x18e297015900:
+				assert False, "Incorrect IENA value: '0x{0:012x}'".format(t.iena)
+
+		d['nanosecond'] = 235
+		t = ptptime.ptptime(d['year'],d['month'],d['day'],d['hour'],d['minute'],d['second'],d['microsecond'],d['nanosecond'], leapyear=d['leapyear'])
+		checkAttributes(t, d)
+
+		if not str(t) == "2008-11-12 16:24:34.123456:235":
+				assert False, "Incorrect Time Formatting: '{0}'".format(str(t))
+
+		if not t.ptp == 0x491b0343075bcaeb:
+				assert False, "Incorrect PTP value: '0x{0:016x}'".format(t.ptp)
+		if not t.sbi == 0x377303174b2434563456:
+				assert False, "Incorrect SBI value: '0x{0:020x}'".format(t.sbi)
+		if not t.iena == 0x18e297015900:
+				assert False, "Incorrect IENA value: '0x{0:012x}'".format(t.iena)
+		
+		d['nanosecond'] = 123
+		t = ptptime.ptptime(d['year'],d['month'],d['day'],d['hour'],d['minute'],d['second'],d['microsecond'],nanosecond=d['nanosecond'], leapyear=d['leapyear'])
+		checkAttributes(t, d)
+
+		if not str(t) == "2008-11-12 16:24:34.123456:123":
+				assert False, "Incorrect Time Formatting: '{0}'".format(str(t))
+
+		if not t.ptp == 0x491b0343075bca7b:
+				assert False, "Incorrect PTP value: '0x{0:016x}'".format(t.ptp)
+		if not t.sbi == 0x377303174b2434563456:
+				assert False, "Incorrect SBI value: '0x{0:020x}'".format(t.sbi)
+		if not t.iena == 0x18e297015900:
+				assert False, "Incorrect IENA value: '0x{0:012x}'".format(t.iena)
