@@ -1,2 +1,3 @@
 yolk
 nose2
+git+https://github.com/douglaskastle/nanotime.git
