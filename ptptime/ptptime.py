@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import datetime
-import nanotime
 import random
+from nanotime import nanotime
 
 def getLeapYear(t):
     if  t.year <= 1972:
